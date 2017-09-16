@@ -1,10 +1,11 @@
-#ifndef STATE_8_PUZZLE_H
-#define STATE_8_PUZZLE_H
+#ifndef PUZZLE_8_STATE_H
+#define PUZZLE_8_STATE_H
 
 #include <string>
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 // Represents an 8-puzzle state as a 3x3 array of chars. Each char can take values in range '0'-'9' (chars, not integers).
 // '0' represents the blank tile.
@@ -42,11 +43,66 @@ public:
 	void Print(std::ostream & out = std::cout) {
 		for (int r = 0; r < 3; r++) {
 			for (int c = 0; c < 3; c++) {
-				out<<tiles[r][c]<<" ";
+				out << tiles[r][c] << " ";
 			}
 			out<<std::endl;
 		}
 		out<<GetKey()<<std::endl;
+	}
+
+	// Generate successors
+	std::vector<Puzzle8State> GenerateSuccessors() {
+		std::vector<Puzzle8State> successors;
+		// blank ('0') tile's possible neighbors
+		int dx[] = {1, -1, 0, 0};
+		int dy[] = {0, 0, 1, -1};
+		// blank ('0') tile's location[row][col]
+		int zeroLocation = this.GetLinearizedForm.find('0', 0);
+		int zeroRow = zeroLocation / 3;
+		int zeroCol = zeroLocation % 3;
+		// find blank ('0') tile's valid neighbors
+		for (int i = 0; i < 4; i++) {
+			// find possible neighbor's location[row][col]
+			int adjRow = zeroRow + dx[i];
+			int adjCol = zeroCol + dy[i];
+			// validate possible neightbor's location[row][col]
+			if (adjRow >= 0 && adjRow < 3 && adjCol >= 0 && adjCol < 3) {
+				// deep copy of the tiles matrix
+				char copy[3][3];
+				for (int r = 0; r < 3; r++) {
+					for (int c = 0; c < 3; c++) {
+						copy[r][c] = tiles[r][c];
+					}
+				}
+				// swap zero and its neighbor
+				copy[zeroRow][zeroCol] = copy[adjRow][adjCol];
+				copy[adjRow][adjCol] = '0';
+			}
+			// add a new successor
+			Puzzle8State successor(copy.GetLinearizedForm());
+			successors.push_back(successor);
+		}
+		return successors;
+	}
+
+	// Get heuristic distance to goal state '012345678'
+	int GetHeuristicDistance() {
+		int totalHeuristicDistance = 0;
+		for (int i = 0; i < 9; i++) {
+			// goal state
+			int goalLocation = i;
+			int goalRow = goalLocation / 3;
+			int goalCol = goalLocation % 3;
+			// current state
+			char currChar = '0' + i;
+			int currLocation = this.GetLinearizedForm().find(currChar, 0);
+			int currRow = currLocation / 3;
+			int currCol = currLocation % 3;
+			// calculate heuristic (manhattan) distance
+			int heuristicDistance = abs(goalRow - currRow) + abs(goalCol - currCol);
+			totalHeuristicDistance += heuristicDistance;
+		}
+		return totalHeuristicDistance;
 	}
 
 private:
