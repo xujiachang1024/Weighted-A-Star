@@ -14,6 +14,7 @@
 
 class Puzzle8State {
 public:
+
 	Puzzle8State(std::string s = "012345678") {
 		assert(s.length() == 9);
 		for (int r = 0; r < 3; r++)
@@ -47,7 +48,7 @@ public:
 			}
 			out<<std::endl;
 		}
-		out<<GetKey()<<std::endl;
+		out << GetKey() << std::endl;
 	}
 
 	// Generate successors
@@ -57,7 +58,7 @@ public:
 		int dx[] = {1, -1, 0, 0};
 		int dy[] = {0, 0, 1, -1};
 		// blank ('0') tile's location[row][col]
-		int zeroLocation = this.GetLinearizedForm.find('0', 0);
+		int zeroLocation = this->GetLinearizedForm().find('0', 0);
 		int zeroRow = zeroLocation / 3;
 		int zeroCol = zeroLocation % 3;
 		// find blank ('0') tile's valid neighbors
@@ -77,10 +78,17 @@ public:
 				// swap zero and its neighbor
 				copy[zeroRow][zeroCol] = copy[adjRow][adjCol];
 				copy[adjRow][adjCol] = '0';
+				// convert the copy matrix to a std::string
+				std::string s = "";
+				for (int r = 0; r < 3; r++) {
+					for (int c = 0; c < 3; c++) {
+						s += copy[r][c];
+					}
+				}
+				// add a new successor
+				Puzzle8State successor(s);
+				successors.push_back(successor);
 			}
-			// add a new successor
-			Puzzle8State successor(copy.GetLinearizedForm());
-			successors.push_back(successor);
 		}
 		return successors;
 	}
@@ -95,7 +103,7 @@ public:
 			int goalCol = goalLocation % 3;
 			// current state
 			char currChar = '0' + i;
-			int currLocation = this.GetLinearizedForm().find(currChar, 0);
+			int currLocation = this->GetLinearizedForm().find(currChar, 0);
 			int currRow = currLocation / 3;
 			int currCol = currLocation % 3;
 			// calculate heuristic (manhattan) distance
@@ -103,6 +111,19 @@ public:
 			totalHeuristicDistance += heuristicDistance;
 		}
 		return totalHeuristicDistance;
+	}
+
+	bool IsEmpty() {
+		bool empty = true;
+		for (int r = 0; r < 3; r++) {
+			for (int c = 0; c < 3; c++) {
+				if (tiles[r][c] != '0') {
+					empty = false;
+					break;
+				}
+			}
+		}
+		return empty;
 	}
 
 private:

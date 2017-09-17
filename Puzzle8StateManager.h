@@ -45,7 +45,7 @@ public:
 	}
 
 private:
-	std::unordered_map<int,int> map;	// Hash table.
+	std::unordered_map<int,int> map;	// Hash table <state_key, next_id>
 	int next_id;	// Keep track of the next id to assign.
 };
 
