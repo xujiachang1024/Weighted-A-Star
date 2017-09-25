@@ -5,18 +5,22 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <cmath>
 
 // Represents an 8-puzzle state as a 3x3 array of chars. Each char can take values in range '0'-'9' (chars, not integers).
 // '0' represents the blank tile.
 // Provides GetKey to uniquely represent the puzzle as an integer (for hashing).
-// You can extend this class to generate successors and get heuristic distance to '012345678', which is always the goal state.
+// You can extend this class to generate successors and get Manhattan distance to '012345678', which is always the goal state.
 
 class Puzzle8State {
 public:
 
+	int cost;
+
 	Puzzle8State(std::string s = "012345678") {
 		assert(s.length() == 9);
+		this->cost = 0;
 		for (int r = 0; r < 3; r++)
 			for (int c = 0; c < 3; c++)
 				tiles[r][c] = s[r*3 + c];
@@ -87,16 +91,17 @@ public:
 				}
 				// add a new successor
 				Puzzle8State successor(s);
+				successor.cost = this->cost + 1;
 				successors.push_back(successor);
 			}
 		}
 		return successors;
 	}
 
-	// Get heuristic distance to goal state '012345678'
-	int GetHeuristicDistance() {
-		int totalHeuristicDistance = 0;
-		for (int i = 0; i < 9; i++) {
+	// Get Manhattan distance to goal state '012345678'
+	int GetManhattanDistance() {
+		int totalManhattanDistance = 0;
+		for (int i = 1; i < 9; i++) {
 			// goal state
 			int goalLocation = i;
 			int goalRow = goalLocation / 3;
@@ -106,13 +111,19 @@ public:
 			int currLocation = this->GetLinearizedForm().find(currChar, 0);
 			int currRow = currLocation / 3;
 			int currCol = currLocation % 3;
-			// calculate heuristic (manhattan) distance
-			int heuristicDistance = abs(goalRow - currRow) + abs(goalCol - currCol);
-			totalHeuristicDistance += heuristicDistance;
+			// calculate manhattan distance
+			int ManhattanDistance = abs(goalRow - currRow) + abs(goalCol - currCol);
+			totalManhattanDistance += ManhattanDistance;
 		}
-		return totalHeuristicDistance;
+		return totalManhattanDistance;
 	}
 
+	// goal test
+	bool is_goal() {
+		return this->GetLinearizedForm() == "012345678";
+	}
+
+	/*
 	bool IsEmpty() {
 		bool empty = true;
 		for (int r = 0; r < 3; r++) {
@@ -125,8 +136,9 @@ public:
 		}
 		return empty;
 	}
+	*/
 
-private:
+protected:
 
 	// tiles[r][c] is the tile (or blank) at row r (0-2) and column c (0-2)
 	// 0th row is the top row, and 0th column is the leftmost column.

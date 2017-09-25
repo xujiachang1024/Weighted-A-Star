@@ -2,6 +2,9 @@
 #define PUZZLE_8_PQ_H
 
 #include <queue>
+#include "Puzzle8State.h"
+
+using namespace std;
 
 // We define an element in the priority queue as a pair of state-id (to uniquely identify which state
 // the element corresponds to) and an f-value (to be used to order the elements in the priority queue).
@@ -13,6 +16,7 @@ struct PQElement {
 
 	int id;
 	double f;
+	Puzzle8State state;
 };
 
 // Comparator is implemented as a greater than operator, so that the priority queue acts as a min heap.

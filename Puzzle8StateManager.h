@@ -2,6 +2,7 @@
 #define PUZZLE_8_STATE_MANAGER_H
 
 #include <unordered_map>
+#include <queue>
 #include "Puzzle8State.h"
 
 // Implements a hash-table for the Puzzle8State class.
